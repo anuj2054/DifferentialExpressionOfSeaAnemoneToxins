@@ -676,9 +676,9 @@ bowtie2 -p 10 -q -x EQ_Trinity.fasta.bowtie2 -1 /home/dnarules/Anuj/ProjectAnemo
 bowtie2 -p 10 -q -x CG_Trinity.fasta.bowtie2 -1 /home/dnarules/Anuj/ProjectAnemone/raw/CGF_R1_paired_trimmed.fastq -2 /home/dnarules/Anuj/ProjectAnemone/raw/CGF_R2_paired_trimmed.fastq 2>&1 1> /dev/null | tee align_stats.txt
 bowtie2 -p 10 -q -x CG_Trinity.fasta.bowtie2 -1 /home/dnarules/Anuj/ProjectAnemone/raw/CGT_R1_paired_trimmed.fastq -2 /home/dnarules/Anuj/ProjectAnemone/raw/CGT_R2_paired_trimmed.fastq 2>&1 1> /dev/null | tee align_stats.txt
 # run the bowtie mapping
+#for whole animal
 bowtie2 -p 12 --time -x EQ_Trinity.fasta -1 /home/dnarules/Anuj/ProjectAnemone/raw/EQF_R1_paired_trimmed.fastq -2 /home/dnarules/Anuj/ProjectAnemone/raw/EQF_R2_paired_trimmed.fastq -S /home/dnarules/Anuj/ProjectAnemone/bowtie/EQF/EQF.sam
-
-
+#for tentacles and foot seperately
 bowtie2 -p 12 --time -x EQ_Trinity.fasta.bowtie2 -1 /home/dnarules/Anuj/ProjectAnemone/raw/EQF1_R1_paired_trimmed.fastq -2 /home/dnarules/Anuj/ProjectAnemone/raw/EQF1_R2_paired_trimmed.fastq -S /home/dnarules/Anuj/ProjectAnemone/bowtie/EQF1.sam
 bowtie2 -p 12 --time -x EQ_Trinity.fasta.bowtie2 -1 /home/dnarules/Anuj/ProjectAnemone/raw/EQF2_R1_paired_trimmed.fastq -2 /home/dnarules/Anuj/ProjectAnemone/raw/EQF2_R2_paired_trimmed.fastq -S /home/dnarules/Anuj/ProjectAnemone/bowtie/EQF2.sam
 bowtie2 -p 12 --time -x EQ_Trinity.fasta.bowtie2 -1 /home/dnarules/Anuj/ProjectAnemone/raw/EQF3_R1_paired_trimmed.fastq -2 /home/dnarules/Anuj/ProjectAnemone/raw/EQF3_R2_paired_trimmed.fastq -S /home/dnarules/Anuj/ProjectAnemone/bowtie/EQF3.sam
@@ -689,8 +689,16 @@ bowtie2 -p 12 --time -x EQ_Trinity.fasta.bowtie2 -1 /home/dnarules/Anuj/ProjectA
 
 # change output from sam to bam
 samtools view -b -S -o bowtie2.bam bowtie2.sam 
+
+########################################
+######################## EXPRESS AND EDGE R using traditional
+
+
 # do the read counting
-express --rf-stranded -o /home/dnarules/Anuj/ProjectAnemone/express/EQF /home/dnarules/Anuj/ProjectAnemone/express/EQF/EQ_Trinity.fasta /home/dnarules/Anuj/ProjectAnemone/EQ/bowtie/EQF.bam
+express --rf-stranded -o /home/dnarules/Anuj/ProjectAnemone/express/EQF1 /home/dnarules/Anuj/ProjectAnemone/express/EQF/EQ_Trinity.fasta /home/dnarules/Anuj/ProjectAnemone/EQ/bowtie/EQF1.bam
+express --rf-stranded -o /home/dnarules/Anuj/ProjectAnemone/express/EQT /home/dnarules/Anuj/ProjectAnemone/express/EQF/EQ_Trinity.fasta /home/dnarules/Anuj/ProjectAnemone/EQ/bowtie/EQF.bam
+express --rf-stranded -o /home/dnarules/Anuj/ProjectAnemone/express/CGF /home/dnarules/Anuj/ProjectAnemone/express/EQF/EQ_Trinity.fasta /home/dnarules/Anuj/ProjectAnemone/EQ/bowtie/EQF.bam
+express --rf-stranded -o /home/dnarules/Anuj/ProjectAnemone/express/CGT /home/dnarules/Anuj/ProjectAnemone/express/EQF/EQ_Trinity.fasta /home/dnarules/Anuj/ProjectAnemone/EQ/bowtie/EQF.bam
 
 #extract the totcounts for each
 cat ./EQT/EQT_express_outdir/EQT_results.xprs | cut -f 2,5 > EQT_transcripts_totCounts.tsv
@@ -729,8 +737,6 @@ colnames(CG_AnnotatedCountMatrix) <- c("transcript_id","sprot_top_blastx_hit","t
 # dont remove the dot's because it can give you the transcripts that are high expressed but not homologous to any other known protein
 CG_AnnotatedCountMatrix <- subset(CG_AnnotatedCountMatrix, sprot_top_blastx_hit!=".")
 write.table(CG_AnnotatedCountMatrix,sep="\t",file="/home/dnarules/Anuj/ProjectAnemone/AnnotationAndCountMatrix/CG_AnnotatedCountMatrix.tsv")
-
-
 EQ_transcript_totcounts <- read.csv("/home/dnarules/Anuj/ProjectAnemone/AnnotationAndCountMatrix/EQ_transcript_TotCount_Matrix.tsv")
 EQ_transcript_annotation <- read.csv("/home/dnarules/Anuj/ProjectAnemone/AnnotationAndCountMatrix/EQ_swissprot_blastx_ProteinAndTranscript.tsv",sep="\t")
 colnames(EQ_transcript_totcounts)[2] <- "transcript_id"
@@ -781,8 +787,6 @@ colnames(CG_AnnotatedCountMatrix) <- c("transcript_id","sprot_top_blastx_hit","T
 # dont remove the dot's because it can give you the transcripts that are high expressed but not homologous to any other known protein
 #CG_AnnotatedCountMatrix <- subset(CG_AnnotatedCountMatrix, sprot_top_blastx_hit!=".")
 write.table(CG_AnnotatedCountMatrix,sep="\t",file="/home/dnarules/Anuj/ProjectAnemone/AnnotationAndCountMatrix/CG_AnnotatedCountMatrix_TPM.tsv")
-
-
 EQ_transcript_TPM <- read.csv("/home/dnarules/Anuj/ProjectAnemone/AnnotationAndCountMatrix/EQ_transcript_TPM_Matrix.tsv")
 EQ_transcript_annotation <- read.csv("/home/dnarules/Anuj/ProjectAnemone/AnnotationAndCountMatrix/EQ_swissprot_blastx_ProteinAndTranscript.tsv",sep="\t")
 colnames(EQ_transcript_TPM)[2] <- "transcript_id"
@@ -803,57 +807,12 @@ grep -wFf UniprotSodiumToxinsProteinsOnly.tsv CG_AnnotatedCountMatrix_TPM.tsv
 # note down the number of genes for that and 
 
 
-#Differential expression USING TRINITY
-########################################################
-##########################################################3
-
-# make the countmatrix for CGF CGT EQF and EQT
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left EQF_R1_paired_trimmed.fastq --right EQF_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left EQT_R1_paired_trimmed.fastq --right EQT_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left CGF_R1_paired_trimmed.fastq --right CGF_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left CGT_R1_paired_trimmed.fastq --right CGT_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
-/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir EQF/express_outdir/results.xprs EQT/express_outdir/results.xprs CGF/express_outdir/results.xprs CGT/express_outdir/results.xprs
-/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir EQF/express_outdir/results.xprs EQT/express_outdir/results.xprs CGF/express_outdir/results.xprs CGT/express_outdir/results.xprs
-
-# make the countmatrix for CGF2 CGF2 CGF3 CGT1 CGT2 CGT3 EQF1 EQF2 EQF2 EQF3 and EQT1 EQT2 EQT3
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGT1_R1_paired_trimmed.fastq --right ../raw/CGT1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGT1express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGT2_R1_paired_trimmed.fastq --right ../raw/CGT2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGT2express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGT3_R1_paired_trimmed.fastq --right ../raw/CGT3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGT3express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGF1_R1_paired_trimmed.fastq --right ../raw/CGF1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGF1express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGF2_R1_paired_trimmed.fastq --right ../raw/CGF2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGF2express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGF3_R1_paired_trimmed.fastq --right ../raw/CGF3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGF3express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQT1_R1_paired_trimmed.fastq --right ../raw/EQT1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQT1express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQT2_R1_paired_trimmed.fastq --right ../raw/EQT2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQT2express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQT3_R1_paired_trimmed.fastq --right ../raw/EQT3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQT3express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQF1_R1_paired_trimmed.fastq --right ../raw/EQF1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQF1express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQF2_R1_paired_trimmed.fastq --right ../raw/EQF2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQF2express_outdir
-/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQF3_R1_paired_trimmed.fastq --right ../raw/EQF3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQF3express_outdir
-/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir EQF1express_outdir/results.xprs EQF2express_outdir/results.xprs EQF3express_outdir/results.xprs EQT1express_outdir/results.xprs EQT2express_outdir/results.xprs EQT3express_outdir/results.xprs
-/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir CGF1express_outdir/results.xprs CGF2express_outdir/results.xprs CGF3express_outdir/results.xprs CGT1express_outdir/results.xprs CGT2express_outdir/results.xprs CGT3express_outdir/results.xprs
-
-# combine the count and the annotation matrix
-/home/dnarules/Trinotate-3.0.2/util/Trinotate_get_feature_name_encoding_attributes.pl ./trinotate/CG/CG_trinotate_annotation_report.xls  > ./AnnotationAndCountMatrix2/CG_annot_feature_map.txt
-/home/dnarules/Trinotate-3.0.2/util/Trinotate_get_feature_name_encoding_attributes.pl ./trinotate/EQ/EQ_trinotate_annotation_report.xls  > ./AnnotationAndCountMatrix2/EQ_annot_feature_map.txt
-/home/dnarules/Trinity/Analysis/DifferentialExpression/rename_matrix_feature_identifiers.pl ./AnnotationAndCountMatrix2/CG_trans_counts.counts.matrix ./AnnotationAndCountMatrix2/CG_annot_feature_map.txt > ./AnnotationAndCountMatrix2/CG_trans.counts.wAnnot.matrix
-/home/dnarules/Trinity/Analysis/DifferentialExpression/rename_matrix_feature_identifiers.pl ./AnnotationAndCountMatrix2/EQ_trans_counts.counts.matrix ./AnnotationAndCountMatrix2/EQ_annot_feature_map.txt > ./AnnotationAndCountMatrix2/EQ_trans.counts.wAnnot.matrix
-/home/dnarules/Trinity/Analysis/DifferentialExpression/rename_matrix_feature_identifiers.pl CG_trans_counts.TMM.EXPR.matrix CG_annot_feature_map.txt > GG_trans.TMM.EXPR.annotated.matrix
-
-# ruun the diff expression part # use only the CG and EQ matrix
-/home/dnarules/Trinity/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix ./edgeR_trinity/CG_trans.counts.wAnnot.matrix  --method edgeR  --samples_file ./edgeR_trinity/samplesCG.txt 
-/home/dnarules/Trinity/Analysis/DifferentialExpression/analyze_diff_expr.pl --matrix ./CG_trans.counts.wAnnot.matrix.CGF_vs_CGT.edgeR.count_matrix -P 1e-3 -C 2 --samples samplesCG.txt   --max_DE_genes_per_comparison 500  
-
-# ruun the diff expression part # use only the CG and EQ matrix but only for the toxins
-/home/dnarules/Trinity/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix ./CG_AnnotatedCountMatrix_totCounts.tsv  --method edgeR  --samples_file ./edgeR_trinity/samplesCG.txt 
-/home/dnarules/Trinity/Analysis/DifferentialExpression/analyze_diff_expr.pl --matrix ./CG_trans.counts.wAnnot.matrix.CGF_vs_CGT.edgeR.count_matrix -P 1e-3 -C 2 --samples samplesCG.txt   --max_DE_genes_per_comparison 500  
-
-
-# run the gene set enrichment analysis part
-/home/dnarules/Trinity/Analysis/DifferentialExpression/analyze_diff_expr.pl --matrix ./CG_trans.TMM.EXPR.annotated.matrix -P 1e-3 -C 2 --samples samplesCG.txt  --max_genes_clust 100  -- also add in the gene set enrichment protocl 
-/home/dnarules/Trinity/Analysis/DifferentialExpression/define_clusters_by_cutting_tree.pl -R  diffExpr.P1e-3_C2.matrix.RData --Ptree 60
-
 
 ##############################################################
 #############################################################
+#DIFFERENTIAL EXPRESSION USING R
+#########################################################3
+########################################################33
 
 ####################################
 ### EdgeR 
@@ -983,7 +942,7 @@ write.csv(DiffExpGenesAlluniqueEQ,file="~/Desktop/Anuj/DiffExpGenesAll_EQFvsEQT.
 ###############################################################################################
 ########################################################################################
 #######################33Top100GEnes in Heatmap #############################################
-
+####THIS IS IN DIFFERENT FILE
 ####################################
 ### EdgeR 
 ####################################
@@ -1222,7 +1181,55 @@ heatmap.2(FinalMatrix4ToxinsDEGsEQ, trace="none", Colv  = F, dendrogram = c("row
 dev.off()
 
 
+###########################################
+########################################
+# Bowtie, express and EDGER USING TRINITY
+########################################################
+##########################################################3
 
+# make the countmatrix for CGF CGT EQF and EQT
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left EQF_R1_paired_trimmed.fastq --right EQF_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left EQT_R1_paired_trimmed.fastq --right EQT_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left CGF_R1_paired_trimmed.fastq --right CGF_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left CGT_R1_paired_trimmed.fastq --right CGT_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir express_outdir
+/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir EQF/express_outdir/results.xprs EQT/express_outdir/results.xprs CGF/express_outdir/results.xprs CGT/express_outdir/results.xprs
+/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir EQF/express_outdir/results.xprs EQT/express_outdir/results.xprs CGF/express_outdir/results.xprs CGT/express_outdir/results.xprs
+
+# make the countmatrix for CGF2 CGF2 CGF3 CGT1 CGT2 CGT3 EQF1 EQF2 EQF2 EQF3 and EQT1 EQT2 EQT3
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGT1_R1_paired_trimmed.fastq --right ../raw/CGT1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGT1express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGT2_R1_paired_trimmed.fastq --right ../raw/CGT2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGT2express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGT3_R1_paired_trimmed.fastq --right ../raw/CGT3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGT3express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGF1_R1_paired_trimmed.fastq --right ../raw/CGF1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGF1express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGF2_R1_paired_trimmed.fastq --right ../raw/CGF2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGF2express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts CG_Trinity.fasta --seqType fq --left ../raw/CGF3_R1_paired_trimmed.fastq --right ../raw/CGF3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir CGF3express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQT1_R1_paired_trimmed.fastq --right ../raw/EQT1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQT1express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQT2_R1_paired_trimmed.fastq --right ../raw/EQT2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQT2express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQT3_R1_paired_trimmed.fastq --right ../raw/EQT3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQT3express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQF1_R1_paired_trimmed.fastq --right ../raw/EQF1_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQF1express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQF2_R1_paired_trimmed.fastq --right ../raw/EQF2_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQF2express_outdir
+/home/dnarules/Trinity/util/align_and_estimate_abundance.pl --transcripts EQ_Trinity.fasta --seqType fq --left ../raw/EQF3_R1_paired_trimmed.fastq --right ../raw/EQF3_R2_paired_trimmed.fastq --est_method eXpress --aln_method bowtie2 --trinity_mode --prep_reference --output_dir EQF3express_outdir
+/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir EQF1express_outdir/results.xprs EQF2express_outdir/results.xprs EQF3express_outdir/results.xprs EQT1express_outdir/results.xprs EQT2express_outdir/results.xprs EQT3express_outdir/results.xprs
+/home/dnarules/Trinity/util/abundance_estimates_to_matrix.pl --est_method express --out_prefix trans_counts --name_sample_by_basedir CGF1express_outdir/results.xprs CGF2express_outdir/results.xprs CGF3express_outdir/results.xprs CGT1express_outdir/results.xprs CGT2express_outdir/results.xprs CGT3express_outdir/results.xprs
+
+# combine the count and the annotation matrix
+/home/dnarules/Trinotate-3.0.2/util/Trinotate_get_feature_name_encoding_attributes.pl ./trinotate/CG/CG_trinotate_annotation_report.xls  > ./AnnotationAndCountMatrix2/CG_annot_feature_map.txt
+/home/dnarules/Trinotate-3.0.2/util/Trinotate_get_feature_name_encoding_attributes.pl ./trinotate/EQ/EQ_trinotate_annotation_report.xls  > ./AnnotationAndCountMatrix2/EQ_annot_feature_map.txt
+/home/dnarules/Trinity/Analysis/DifferentialExpression/rename_matrix_feature_identifiers.pl ./AnnotationAndCountMatrix2/CG_trans_counts.counts.matrix ./AnnotationAndCountMatrix2/CG_annot_feature_map.txt > ./AnnotationAndCountMatrix2/CG_trans.counts.wAnnot.matrix
+/home/dnarules/Trinity/Analysis/DifferentialExpression/rename_matrix_feature_identifiers.pl ./AnnotationAndCountMatrix2/EQ_trans_counts.counts.matrix ./AnnotationAndCountMatrix2/EQ_annot_feature_map.txt > ./AnnotationAndCountMatrix2/EQ_trans.counts.wAnnot.matrix
+/home/dnarules/Trinity/Analysis/DifferentialExpression/rename_matrix_feature_identifiers.pl CG_trans_counts.TMM.EXPR.matrix CG_annot_feature_map.txt > GG_trans.TMM.EXPR.annotated.matrix
+
+# ruun the diff expression part # use only the CG and EQ matrix
+/home/dnarules/Trinity/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix ./edgeR_trinity/CG_trans.counts.wAnnot.matrix  --method edgeR  --samples_file ./edgeR_trinity/samplesCG.txt 
+/home/dnarules/Trinity/Analysis/DifferentialExpression/analyze_diff_expr.pl --matrix ./CG_trans.counts.wAnnot.matrix.CGF_vs_CGT.edgeR.count_matrix -P 1e-3 -C 2 --samples samplesCG.txt   --max_DE_genes_per_comparison 500  
+
+# ruun the diff expression part # use only the CG and EQ matrix but only for the toxins
+/home/dnarules/Trinity/Analysis/DifferentialExpression/run_DE_analysis.pl --matrix ./CG_AnnotatedCountMatrix_totCounts.tsv  --method edgeR  --samples_file ./edgeR_trinity/samplesCG.txt 
+/home/dnarules/Trinity/Analysis/DifferentialExpression/analyze_diff_expr.pl --matrix ./CG_trans.counts.wAnnot.matrix.CGF_vs_CGT.edgeR.count_matrix -P 1e-3 -C 2 --samples samplesCG.txt   --max_DE_genes_per_comparison 500  
+
+
+# run the gene set enrichment analysis part
+/home/dnarules/Trinity/Analysis/DifferentialExpression/analyze_diff_expr.pl --matrix ./CG_trans.TMM.EXPR.annotated.matrix -P 1e-3 -C 2 --samples samplesCG.txt  --max_genes_clust 100  -- also add in the gene set enrichment protocl 
+/home/dnarules/Trinity/Analysis/DifferentialExpression/define_clusters_by_cutting_tree.pl -R  diffExpr.P1e-3_C2.matrix.RData --Ptree 60
 
 
 
